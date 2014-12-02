@@ -1,12 +1,12 @@
 
-/* variables dht11 
+//variables dht11
 #include "DHT.h"          // Libreria para Sensores Temperatura DHT
 #define DHTPIN 2         // Pin del Arduino al cual esta conectado el pin 2 del sensor
 #define DHTTYPE DHT11   // DHT 11  sensor DHT usado
 DHT dht(DHTPIN, DHTTYPE);   // Inicializa el sensor
 
 
-/* variables motor dc 
+//variables motor dc
 #define DCPIN 3 ; // Pin 3 que puede generar PWM
 int velocidad = 255; // variable donde almacenamos la velocidad del motor 0-255
 
