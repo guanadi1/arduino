@@ -11,9 +11,6 @@ DHT dht(DHTPIN, DHTTYPE);   // Inicializa el sensor
 int velocidad = 255; // variable donde almacenamos la velocidad del motor 0-255
 
 
-
-
-
 // Configura Arduino 
 void setup() {
   pinMode(DCPIN, OUTPUT); // pin DC output
@@ -24,12 +21,9 @@ void setup() {
 }
 
 
-
 void loop() {
 
   delay(2000); // Espera dos segundos para realizar la primera medición.
-
-    
 
   float humedad = dht.readHumidity(); // Obtiene la Humedad
   float temperatura = dht.readTemperature();   // Obtiene la Temperatura en Celsius
@@ -45,6 +39,7 @@ void loop() {
   Serial.print("Temperatura: "); 
   Serial.print(t);
   Serial.println(" *C ");
+  
   
   // encendemos el motor si la temperatura sobrepasa los 25 grados Celsius
   if (temperatura > 25){
