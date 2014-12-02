@@ -21,22 +21,45 @@ int velocidad = 255; // variable donde almacenamos la velocidad del motor 0-255
 #define REDRGB 4    // Pin 4 para el color rojo 
 #define GREENRGB 5    // Pin 5 para el color verde 
 #define BLUERGB 6    //Pin 6 para el color azul  
-int 
+
+//variable sensor ultrasonico y speaker
+// libreria NEWPIN https://arduino-new-ping.googlecode.com/files/NewPing_v1.5.zip
+
+#include <NewPing.h>
+#define TRIGGER_PIN  7
+#define ECHO_PIN     8
+#define MAX_DISTANCE 200     
+NewPing sonar(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE);   //Crear el objeto de la clase NewPing
+#define SPEAKERPIN 9         //pin speaker PWN
+
+
+
+
 
 // Configura Arduino 
 void setup() {
 
+  // bloutooth
   bluetoothBridge.begin(9600); // inciamos comunicacion bluetooth
   Serial.println("Connection inciada bluetooth ");
 
+  // motor 
   pinMode(DCPIN, OUTPUT); // pin motor DC output
+ 
+ // PIR , speaker
+  pinMode(PIRPIN, INPUT);     // declaramos sensor PIR  es de entrada 
+  pinMode(SPEAKERPIN, OUTPUT);
 
+  // rgb
   pinMode(REDRGB, OUTPUT);
   pinMode(GREENRGB, OUTPUT);
   pinMode(BLUERGB, OUTPUT);  
-
+ 
+  //monitor serial
   Serial.begin(9600); 
   Serial.println("Prueba log:");
+
+  // dth 11
   dht.begin();  // iniciamos sensor 
 
 }
@@ -46,21 +69,24 @@ void setup() {
 void loop() {
 
   delay(2000); // Espera dos segundos para realizar la primera medición.
+
+
   rec = bluetoothBridge.read();   // leemos la comunicacion serial de bluetooth
   switch(rec){
-     case 'led0':
+     case 'rgb0':
      setColor(0, 255, 255);  // ilumina led rgb con color aqua 
      Serial.println(" led encendido");
      break;
 
-     case 'led1':
+     case 'rgb1':
      setColor(0, 0, 0);  // apagamos el led 
      Serial.println(" led apagado");
      break;
 
 }
 
-    
+
+// sesor de temperatura    
 
   float humedad = dht.readHumidity(); // Obtiene la Humedad
   float temperatura = dht.readTemperature();   // Obtiene la Temperatura en Celsius
@@ -85,9 +111,32 @@ void loop() {
   }
 
 
+
+// sensor ultrasonico y speaker
+
+
+  int uS = sonar.ping_median();  // Obtener medicion de tiempo de viaje del sonido y guardar en variable uS
+  long distancia= uS/US_ROUNDTRIP_CM;  // Calcular la distancia con base en una constante
+  Serial.print("Distancia: ");// Imprimir la distancia medida a la consola serial
+   Serial.print(distancia );
+  Serial.println("cm");
+
+  if (distancia > 2) {            // check if the input is HIGH
+    playTone(300, 160);
+    delay(150);
+  } else { 
+      playTone(0, 0);
+      delay(150);    
+    }
+  }
+
 }
 
+
+
+
 // funcion que asigna el color 
+
 void setColor(int red, int green, int blue) {
   #ifdef COMMON_ANODE
     red = 255 - red;
@@ -106,6 +155,19 @@ void setColor(int red, int green, int blue) {
     setColor(80, 0, 80);  // purple
 */
 
-
 }
 
+
+// tono alarma duracion en mSecs, frequencia en hertz
+void playTono(long duracion, int freq) {
+    duracion *= 1000;
+    int periodo = (1.0 / freq) * 1000000;
+    long tiempo_transcurrido = 0;
+    while (tiempo_transcurrido < duracion) {
+        digitalWrite(SPEAKERPIN,HIGH);
+        delayMicroseconds(periodo / 2);
+        digitalWrite(SPEAKERPIN, LOW);
+        delayMicroseconds(periodo / 2);
+        tiempo_transcurrido += (periodo);
+    }
+}
