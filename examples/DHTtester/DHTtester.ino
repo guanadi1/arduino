@@ -3,7 +3,7 @@
 #include <SoftwareSerial.h>
 char rec; // variable que recoje valor enviado
 char send // variable con valor a enviar 
-SoftwareSerial bluetoothBridge(2,3);
+SoftwareSerial bluetoothBridge(10,11);
 
 
 // variables y librerias dht11 
@@ -46,9 +46,8 @@ void setup() {
   // motor 
   pinMode(DCPIN, OUTPUT); // pin motor DC output
  
- // PIR , speaker
-  pinMode(PIRPIN, INPUT);     // declaramos sensor PIR  es de entrada 
-  pinMode(SPEAKERPIN, OUTPUT);
+ //  speaker
+  pinMode(SPEAKERPIN, OUTPUT);  // declaramos speker pin es de salida
 
   // rgb
   pinMode(REDRGB, OUTPUT);
