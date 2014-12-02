@@ -3,7 +3,7 @@
 #include <SoftwareSerial.h>
 char rec; // variable que recoje valor enviado
 char send // variable con valor a enviar 
-SoftwareSerial bluetoothBridge(10,11);
+SoftwareSerial bluetoothBridge(2,3);
 
 
 // variables y librerias dht11 
@@ -33,6 +33,10 @@ NewPing sonar(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE);   //Crear el objeto de la cl
 #define SPEAKERPIN 9         //pin speaker PWN
 
 
+// VARIABLES RELAY
+
+#define RELAYPIN 12            // PIN al que va conectado el relé
+
 
 
 
@@ -46,8 +50,9 @@ void setup() {
   // motor 
   pinMode(DCPIN, OUTPUT); // pin motor DC output
  
- //  speaker
-  pinMode(SPEAKERPIN, OUTPUT);  // declaramos speker pin es de salida
+ // PIR , speaker
+  pinMode(PIRPIN, INPUT);     // declaramos sensor PIR  es de entrada 
+  pinMode(SPEAKERPIN, OUTPUT);
 
   // rgb
   pinMode(REDRGB, OUTPUT);
@@ -57,6 +62,10 @@ void setup() {
   //monitor serial
   Serial.begin(9600); 
   Serial.println("Prueba log:");
+
+
+  pinMode(RELAYPIN, OUTPUT);  // PIN relay como salida
+
 
   // dth 11
   dht.begin();  // iniciamos sensor 
@@ -81,6 +90,18 @@ void loop() {
      setColor(0, 0, 0);  // apagamos el led 
      Serial.println(" led apagado");
      break;
+
+     case 'relay1':
+     digitalWrite(RELAYPIN, HIGH);   // bombilla ENCENDIDO
+     Serial.println(" bombilla encendido");
+     break; 
+
+     case 'relay0':
+      digitalWrite(relayPin, LOW);    // bombilla APAGADO
+     Serial.println(" led encendido");
+     break;
+
+
 
 }
 
@@ -170,3 +191,6 @@ void playTono(long duracion, int freq) {
         tiempo_transcurrido += (periodo);
     }
 }
+
+
+
