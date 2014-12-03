@@ -1,57 +1,39 @@
-
 // libreria y variables  comunicacion serial con bbluetooth
-#include <SoftwareSerial.h>
-char rec; // variable que recoje valor enviado
-char send // variable con valor a enviar 
-SoftwareSerial bluetoothBridge(2,3);
 
+#include <SoftwareSerial.h>
+#include <NewPing.h>
+#include "DHT.h"          // Libreria para Sensores Temperatura DHT
 
 // variables y librerias dht11 
-#include "DHT.h"          // Libreria para Sensores Temperatura DHT
 #define DHTPIN 2         // conectado en el pin 2 del sensor
 #define DHTTYPE DHT11   // DHT 11  sensor DHT usado
-DHT dht(DHTPIN, DHTTYPE);   // Inicializa el sensor
-
-
 // variables motor dc 
 #define DCPIN 3   // Pin 3 PWM motor 
-int velocidad = 255; // variable donde almacenamos la velocidad del motor 0-255
-
 // variables led RGB
 #define REDRGB 4    // Pin 4 para el color rojo 
 #define GREENRGB 5    // Pin 5 para el color verde 
 #define BLUERGB 6    //Pin 6 para el color azul  
-
 //variable sensor ultrasonico y speaker
 // libreria NEWPIN https://arduino-new-ping.googlecode.com/files/NewPing_v1.5.zip
-
-#include <NewPing.h>
 #define TRIGGER_PIN  7
 #define ECHO_PIN     8
-#define MAX_DISTANCE 200     
-NewPing sonar(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE);   //Crear el objeto de la clase NewPing
+#define MAX_DISTANCE 200   
 #define SPEAKERPIN 9         //pin speaker PWN
-
-
 // VARIABLES RELAY
-
 #define RELAYPIN 12            // PIN al que va conectado el relé
-
-
-
+NewPing sonar(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE);   //Crear el objeto de la clase NewPing
+DHT dht(DHTPIN, DHTTYPE);   // Inicializa el sensor
+SoftwareSerial bluetoothBridge(2,3);
+char rec; // variable que recoje valor enviado
+char sen; // variable con valor a enviar 
+int velocidad = 255; // variable donde almacenamos la velocidad del motor 0-255
 
 // Configura Arduino 
 void setup() {
-
-  // bloutooth
-  bluetoothBridge.begin(9600); // inciamos comunicacion bluetooth
-  Serial.println("Connection inciada bluetooth ");
-
   // motor 
   pinMode(DCPIN, OUTPUT); // pin motor DC output
  
- // PIR , speaker
-  pinMode(PIRPIN, INPUT);     // declaramos sensor PIR  es de entrada 
+ // speaker
   pinMode(SPEAKERPIN, OUTPUT);
 
   // rgb
@@ -62,8 +44,9 @@ void setup() {
   //monitor serial
   Serial.begin(9600); 
   Serial.println("Prueba log:");
-
-
+    // bloutooth
+  bluetoothBridge.begin(9600); // inciamos comunicacion bluetooth
+  Serial.println("Connection inciada bluetooth ");
   pinMode(RELAYPIN, OUTPUT);  // PIN relay como salida
 
 
@@ -77,32 +60,28 @@ void setup() {
 void loop() {
 
   delay(2000); // Espera dos segundos para realizar la primera medición.
-
-
-  rec = bluetoothBridge.read();   // leemos la comunicacion serial de bluetooth
+  leerDato();
+  Serial.print("valor rec :");
+  Serial.println(rec);
   switch(rec){
-     case 'rgb0':
+     case '0':
      setColor(0, 255, 255);  // ilumina led rgb con color aqua 
      Serial.println(" led encendido");
      break;
 
-     case 'rgb1':
+     case '1':
      setColor(0, 0, 0);  // apagamos el led 
      Serial.println(" led apagado");
      break;
-
-     case 'relay1':
+     case '2':
      digitalWrite(RELAYPIN, HIGH);   // bombilla ENCENDIDO
      Serial.println(" bombilla encendido");
      break; 
 
-     case 'relay0':
-      digitalWrite(relayPin, LOW);    // bombilla APAGADO
+     case '3':
+      digitalWrite(RELAYPIN, LOW);    // bombilla APAGADO
      Serial.println(" led encendido");
-     break;
-
-
-
+     break; 
 }
 
 
@@ -116,18 +95,26 @@ void loop() {
     Serial.println("Fallo al leer el sensor DHT!");
     return;
   }
-  Serial.print("Humedad: "); 
-  Serial.print(h);
-  Serial.print(" %\t");
-  Serial.print("Temperatura: "); 
-  Serial.print(t);
-  Serial.println(" *C ");
   
   // encendemos el motor si la temperatura sobrepasa los 25 grados Celsius
   if (temperatura > 25){
    analogWrite(DCPIN, velocidad);
+   Serial.println("Ventilador Encendido"); 
+   Serial.print("Humedad: "); 
+   Serial.print(humedad);
+   Serial.print(" %\t");
+   Serial.print("Temperatura: "); 
+   Serial.print(temperatura);
+   Serial.println(" *C ");
   }else{
    analogWrite(DCPIN, 0);
+    Serial.println("Ventilador Apagado"); 
+    Serial.print("Humedad: "); 
+    Serial.print(humedad);
+    Serial.print(" %\t");
+    Serial.print("Temperatura: "); 
+    Serial.print(temperatura);
+    Serial.println(" *C ");
   }
 
 
@@ -139,16 +126,15 @@ void loop() {
   long distancia= uS/US_ROUNDTRIP_CM;  // Calcular la distancia con base en una constante
   Serial.print("Distancia: ");// Imprimir la distancia medida a la consola serial
    Serial.print(distancia );
-  Serial.println("cm");
+  Serial.println(" cm");
 
   if (distancia > 2) {            // check if the input is HIGH
-    playTone(300, 160);
+    playTono(300, 160);
     delay(150);
   } else { 
-      playTone(0, 0);
+      playTono(0, 0);
       delay(150);    
     }
-  }
 
 }
 
@@ -192,5 +178,11 @@ void playTono(long duracion, int freq) {
     }
 }
 
-
+void leerDato(){
+ if (Serial.available()>0){
+  rec = Serial.read();
+ //rec = bluetoothBridge.read();   // leemos la comunicacion serial de bluetooth
+}
+  Serial.flush(); 
+}
 
