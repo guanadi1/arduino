@@ -21,7 +21,7 @@
 
 NewPing sonar(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE); //iniciamos sensor ultrasonico con la clase NewPing
 DHT dht(DHTPIN, DHTTYPE); // Inicializa el sensor dth
-SoftwareSerial bluetoothBridge(2,3);  // Inicializa bluetooth
+SoftwareSerial bluetoothBridge(10,11);  // Inicializa bluetooth
 char rec; // variable que recoje valor recibido
 char sen; // variable con valor a enviar
 int velocidad = 255; // variable donde almacenamos la velocidad del motor 0-255
