@@ -7,6 +7,7 @@
 #define DHTTYPE DHT11 // tipo de sensor DHT usado
 #define DCPIN 3 // pin 3 motor dc 
 // variables led RGB
+#define LDRPIN 0   // pin 0 analogo 
 #define REDRGB 4 // Pin 4 para el color rojo
 #define GREENRGB 5 // Pin 5 para el color verde
 #define BLUERGB 6 //Pin 6 para el color azul
@@ -32,6 +33,7 @@ void setup() {
 
 pinMode(DCPIN, OUTPUT); // pin motor DC como salida
 pinMode(SPEAKERPIN, OUTPUT); // speaker como salida 
+pinMode(LDRPIN, INPUT);   // pin analogico ldr como entrada 
 pinMode(REDRGB, OUTPUT);  // rgb pins como salida 
 pinMode(GREENRGB, OUTPUT);
 pinMode(BLUERGB, OUTPUT);
@@ -51,9 +53,28 @@ void loop() {
 
 delay(2000); // Espera dos segundos para realizar la primera medición.
 
-leerDato();  // leer datos de serial 
+leerDato();  // leer datos de serial y lo almacena en rec
+
 Serial.print("valor recibido:");
 Serial.println(rec);
+
+/*----------ldr---------------*/
+
+int vldr = analogRead(LDR);
+Serial.println(v);
+
+if( vdlr < 400 ){
+
+setColor(0, 255, 255); // ilumina led rgb con color aqua
+Serial.println(" led encendido");
+
+}else{
+
+setColor(0, 0, 0); // apagamos el led
+Serial.println(" led apagado");
+
+}
+
 
 
 switch(rec){
@@ -161,3 +182,15 @@ rec = Serial.read();
 }
 Serial.flush();
 }
+
+
+/*
+
+- led rgb ok falta 
+- rele bombilla ok
+- sensor ultrasonico y alarma ok
+- conexion bluetooth ok
+- temperatura con ventilador ok
+- 
+
+*/
